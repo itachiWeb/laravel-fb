@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\User;
+use App\Post;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
@@ -28,8 +29,27 @@ class PostToTimelineTest extends TestCase
             ]
         ]);
 
-        $post = \App\Post::first();
+        // $post = \App\Post::first(); 5行目にuse App\User;と記載しているため、\App\は不要。
+        $post = Post::first();
 
-        $response->assertStatus(201);
+        $this->assertCount(1, Post::all());
+        //一致していなければエラーを返す
+        $this->assertEquals($user->id, $post->user_id);
+        $this->assertEquals('Testing Body', $post->body);
+
+        $response->assertStatus(201)
+            ->assertJson([
+                'data' => [
+                    'type' => 'posts',
+                    'post_id' => $post->id,
+                    'attributes' => [
+                        'body' => 'Testing Body',
+                    ]
+                ],
+                'links' => [
+                    'self' => url('/posts/'.$post->id),
+                ]
+
+        ]);
     }
 }
