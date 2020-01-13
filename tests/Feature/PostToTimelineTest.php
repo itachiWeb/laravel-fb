@@ -18,7 +18,8 @@ class PostToTimelineTest extends TestCase
         $this->withoutExceptionHandling();
         //参考:https://qiita.com/Fea/items/7d70caa52e73c3fd8dfe
         $this->actingAs($user = factory(User::class)->create(), 'api');
-        //use App\User; を追記したため、\App\を省略できる。
+        //ここで新規ユーザーを作成しています。（おそらく）
+        //5行目にuse App\User; を追記したため、\App\を省略できる。
 
         $response = $this->post('/api/posts', [
             'data' => [
@@ -43,6 +44,13 @@ class PostToTimelineTest extends TestCase
                     'type' => 'posts',
                     'post_id' => $post->id,
                     'attributes' => [
+                        'posted_by' => [
+                            'data' => [
+                                'attributes' => [
+                                    'name' => $user->name,
+                                ]
+                            ]
+                        ],
                         'body' => 'Testing Body',
                     ]
                 ],
